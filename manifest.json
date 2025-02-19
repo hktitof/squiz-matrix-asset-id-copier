@@ -25,4 +25,15 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   }
+  // "privacy_policy_url": "https://your-website.com/privacy-policy"
 }
+
+// Privacy Policy Requirements:
+
+// Create a privacy policy that includes:
+
+// What data your extension collects (URLs, clipboard data)
+// How this data is used
+// Confirmation that you don't store or transmit any personal data
+// Contact information for users
+// Data retention/deletion policy

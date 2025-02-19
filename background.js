@@ -26,7 +26,6 @@ chrome.tabs.onActivated.addListener(function (activeInfo) {
       return;
     }
     if (tab.url) {
-      console.log("Tab URL: " + tab.url);
       console.log("Is Squiz Matrix admin: " + isSquizMatrixAdmin(tab.url));
     }
   });

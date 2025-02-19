@@ -212,6 +212,25 @@
       .shortcut-buttons .btn-secondary:hover {
         background-color: #4b5563;
       }
+      .permission-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin: 0 0 8px 0;
+      }
+
+      .permission-list {
+        margin: 0;
+        padding-left: 20px;
+        font-size: 0.8rem;
+      }
+
+      .permission-list li {
+        margin-bottom: 4px;
+      }
+
+      .permissions-info {
+        margin-bottom: 16px;
+      }
     </style>
   </head>
   <body>
@@ -221,6 +240,16 @@
       </div>
 
       <div class="content">
+        <div id="permissions-info" class="permissions-info">
+          <div class="alert alert-blue">
+            <h3 class="permission-title">Required Permissions</h3>
+            <ul class="permission-list">
+              <li><strong>URLs:</strong> To detect Squiz Matrix admin pages</li>
+              <li><strong>Clipboard:</strong> To copy asset IDs</li>
+              <li><strong>Storage:</strong> To save your keyboard shortcuts</li>
+            </ul>
+          </div>
+        </div>
         <!-- Not a Squiz Matrix admin page -->
         <div id="not-admin-page" class="hidden">
           <div class="alert alert-yellow">

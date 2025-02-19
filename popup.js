@@ -217,6 +217,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+  // get the permissions info element
+  const permissionsInfoEl = document.getElementById("permissions-info");
+
   // Handle permission grant button click
   grantPermissionBtn.addEventListener("click", function () {
     grantPermissionBtn.textContent = "Enabling...";
@@ -247,7 +250,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 files: ["content.js"],
               })
               .then(() => {
+                // Hide both the permission required and permissions info sections
                 permissionRequiredEl.classList.add("hidden");
+                permissionsInfoEl.classList.add("hidden");
                 adminPageEl.classList.remove("hidden");
                 loadCurrentShortcut();
                 addDebugInfo("Script injected successfully");
@@ -266,7 +271,9 @@ document.addEventListener("DOMContentLoaded", function () {
               files: ["content.js"],
             })
             .then(() => {
+              // Hide both the permission required and permissions info sections
               permissionRequiredEl.classList.add("hidden");
+              permissionsInfoEl.classList.add("hidden");
               adminPageEl.classList.remove("hidden");
               loadCurrentShortcut();
               addDebugInfo("Script re-injected successfully");

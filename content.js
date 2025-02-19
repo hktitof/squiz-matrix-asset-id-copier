@@ -1,5 +1,5 @@
 (function () {
-  // At top of content.js
+  // Check if the script is running in an iframe
   if (window !== window.top) {
     if (!isSquizMatrixAdmin(window.location.href)) return;
   }
@@ -57,6 +57,7 @@
 
     document.body.appendChild(notification);
 
+    // Fade out and remove notification after 2 seconds
     setTimeout(() => {
       notification.style.opacity = "0";
       notification.style.transition = "opacity 0.5s";
@@ -145,12 +146,17 @@
 
   // Indicate extension is active
   console.log("Squiz Matrix Asset ID Copier is active on this page");
-  console.log("Using shortcut: " + currentShortcut);
 })();
 
+//This function checks if a given URL is an admin page of Squiz Matrix
+//It takes a URL as a parameter
 function isSquizMatrixAdmin(url) {
+  //If the URL is not provided, return false
   if (!url) return false;
+  //Convert the URL to lowercase
   const lowerUrl = url.toLowerCase();
+  //Define an array of admin page patterns
   const patterns = ["/_admin", "/_admin/", "/_admin?", "/_admin#"];
+  //Check if the URL contains any of the admin page patterns
   return patterns.some(pattern => lowerUrl.includes(pattern));
 }
