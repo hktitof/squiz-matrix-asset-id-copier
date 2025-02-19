@@ -1,23 +1,24 @@
 {
   "manifest_version": 3,
   "name": "Squiz Matrix Asset ID Copier",
-  "description": "Quickly copy asset IDs from the Squiz Matrix admin panel using a keyboard shortcut.",
+  "description": "Quickly copy asset IDs from the Squiz Matrix admin panel using Command/Ctrl + Shift + C.",
   "version": "1.0",
-  "permissions": ["scripting"],
-  "optional_host_permissions": ["*://*/*_admin*"],
+  "permissions": ["storage", "activeTab", "scripting", "tabs"],
+  "host_permissions": [],
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["*://*/*_admin*"],
+      "matches": ["*://*/*_admin*", "*://*/*/_admin*", "*://*/_admin*"],
       "js": ["content.js"],
       "run_at": "document_idle",
       "all_frames": true
     }
   ],
   "action": {
-    "default_title": "Copy Squiz Matrix Asset ID"
+    "default_title": "Copy Squiz Matrix Asset ID",
+    "default_popup": "popup.html"
   },
   "icons": {
     "16": "icons/icon16.png",
