@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Squiz Matrix Asset ID Copier",
+"description": "Squiz Matrix Asset ID Copier simplifies asset management by allowing users to quickly copy asset IDs from the Squiz Matrix admin panel. Just select an asset and press Command + Shift + C (Mac) or Ctrl + Shift + C (Windows) to copy its ID to the clipboard. Note: This shortcut will be overridden by the extension while active.",
+  "version": "1.0",
+  "permissions": ["scripting"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*/*_admin*"],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "action": {
+    "default_title": "Copy Squiz Matrix Asset ID"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
