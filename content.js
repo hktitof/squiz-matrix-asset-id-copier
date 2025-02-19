@@ -1,9 +1,20 @@
-// content.js
 (function () {
   // At top of content.js
   if (window !== window.top) {
     if (!isSquizMatrixAdmin(window.location.href)) return;
   }
+
+  // Store the current shortcut
+  let currentShortcut = "";
+  const DEFAULT_MAC_SHORTCUT = "Command+Shift+C";
+  const DEFAULT_WINDOWS_SHORTCUT = "Ctrl+Shift+C";
+  const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+
+  // Load the saved shortcut
+  chrome.storage.local.get(["keyboardShortcut"], function (result) {
+    currentShortcut = result.keyboardShortcut || (isMac ? DEFAULT_MAC_SHORTCUT : DEFAULT_WINDOWS_SHORTCUT);
+    console.log("Loaded shortcut: " + currentShortcut);
+  });
 
   // Function to find and copy the selected asset ID
   function findSelectedAsset() {
@@ -53,11 +64,57 @@
     }, 2000);
   }
 
-  // Listen for Command + Shift + C (Mac) or Ctrl + Shift + C (Windows)
+  // Parse a shortcut string into its components
+  function parseShortcut(shortcutStr) {
+    const keys = shortcutStr.split("+");
+    return {
+      ctrl: keys.includes("Ctrl"),
+      shift: keys.includes("Shift"),
+      alt: keys.includes("Alt"),
+      meta: keys.includes("Command"),
+      key: keys.find(k => !["Ctrl", "Shift", "Alt", "Command"].includes(k)),
+    };
+  }
+
+  // Check if event matches the current shortcut
+  function matchesShortcut(event, shortcutStr) {
+    if (!shortcutStr) return false;
+
+    const shortcut = parseShortcut(shortcutStr);
+
+    // Check modifiers
+    if (shortcut.ctrl !== event.ctrlKey) return false;
+    if (shortcut.shift !== event.shiftKey) return false;
+    if (shortcut.alt !== event.altKey) return false;
+    if (shortcut.meta !== event.metaKey) return false;
+
+    // Check key
+    if (shortcut.key) {
+      // Handle function keys
+      if (shortcut.key.startsWith("F") && !isNaN(shortcut.key.substring(1))) {
+        return event.key === shortcut.key;
+      }
+
+      // Handle letter keys (case insensitive)
+      if (shortcut.key.length === 1) {
+        return event.key.toUpperCase() === shortcut.key.toUpperCase();
+      }
+
+      // Handle other keys
+      return (
+        event.code === "Key" + shortcut.key || event.code === "Digit" + shortcut.key || event.code === shortcut.key
+      );
+    }
+
+    return false;
+  }
+
+  // Listen for keyboard events
   document.addEventListener(
     "keydown",
     event => {
-      if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.code === "KeyC") {
+      // If matches current shortcut
+      if (matchesShortcut(event, currentShortcut)) {
         event.stopImmediatePropagation();
         event.preventDefault();
         findSelectedAsset();
@@ -71,18 +128,24 @@
     if (message.action === "ping") {
       sendResponse({ status: "active" });
     }
-    return true;
-  });
 
-  // Add NEW command listener
-  chrome.runtime.onMessage.addListener(message => {
-    if (message.command === "copy-asset-id") {
-      findSelectedAsset(); // This triggers your copy function
+    // Handle shortcut update
+    if (message.action === "updateShortcut" && message.shortcut) {
+      currentShortcut = message.shortcut;
+      console.log("Updated shortcut to: " + currentShortcut);
     }
+
+    // Handle the copy command
+    if (message.command === "copy-asset-id") {
+      findSelectedAsset();
+    }
+
+    return true;
   });
 
   // Indicate extension is active
   console.log("Squiz Matrix Asset ID Copier is active on this page");
+  console.log("Using shortcut: " + currentShortcut);
 })();
 
 function isSquizMatrixAdmin(url) {

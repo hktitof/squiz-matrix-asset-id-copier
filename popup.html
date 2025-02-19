@@ -54,6 +54,11 @@
         border-left-color: #3b82f6;
         color: #1e40af;
       }
+      .alert-red {
+        background-color: #fee2e2;
+        border-left-color: #ef4444;
+        color: #991b1b;
+      }
       .alert p {
         margin: 0;
       }
@@ -117,6 +122,96 @@
         padding: 16px 0;
         color: #6b7280;
       }
+      .shortcut-container {
+        margin-top: 16px;
+        padding: 12px;
+        background-color: #f9fafb;
+        border-radius: 6px;
+        border: 1px solid #e5e7eb;
+      }
+      .shortcut-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: #374151;
+      }
+      .shortcut-input-container {
+        position: relative;
+        margin-bottom: 12px;
+      }
+      .shortcut-input {
+        width: calc(100% - 24px); /* Account for padding */
+        padding: 8px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        font-family: inherit;
+        background-color: white;
+        box-sizing: border-box;
+        cursor: pointer;
+        text-align: center;
+      }
+      .shortcut-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+      }
+      .shortcut-placeholder {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        color: #9ca3af;
+        font-size: 0.75rem;
+      }
+      .shortcut-input:focus + .shortcut-placeholder,
+      .shortcut-input:not(:placeholder-shown) + .shortcut-placeholder {
+        display: none;
+      }
+      .shortcut-info {
+        font-size: 0.75rem;
+        color: #6b7280;
+        margin-top: 8px;
+      }
+      .shortcut-tip {
+        background-color: #dbeafe;
+        border-radius: 4px;
+        padding: 8px 12px;
+        margin: 12px 0;
+        font-size: 0.75rem;
+        color: #1e40af;
+        display: flex;
+        align-items: flex-start;
+      }
+      .shortcut-tip-icon {
+        margin-right: 8px;
+        font-size: 1rem;
+      }
+      .shortcut-warning {
+        margin-top: 12px;
+        font-size: 0.75rem;
+        color: #b91c1c;
+      }
+      .shortcut-buttons {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .shortcut-buttons .btn {
+        flex: 1;
+      }
+      .shortcut-buttons .btn-secondary {
+        background-color: #6b7280;
+      }
+      .shortcut-buttons .btn-secondary:hover {
+        background-color: #4b5563;
+      }
     </style>
   </head>
   <body>
@@ -144,9 +239,42 @@
             <h2 class="section-title">Quick Instructions:</h2>
             <ol>
               <li>Select an asset in the Squiz Matrix panel</li>
-              <li>Press <kbd>Cmd/Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd></li>
+              <li>
+                Press your configured shortcut (default: <kbd id="default-shortcut">Cmd/Ctrl</kbd> + <kbd>Shift</kbd> +
+                <kbd>C</kbd>)
+              </li>
               <li>Asset ID copied to clipboard!</li>
             </ol>
+          </div>
+
+          <!-- Shortcut Configuration -->
+          <div class="shortcut-container">
+            <h2 class="section-title">Keyboard Shortcut</h2>
+
+            <div class="shortcut-tip">
+              <span class="shortcut-tip-icon">💡</span>
+              <span
+                >Click the box below and press your desired key combination (e.g., Ctrl+Shift+A), then click Save.</span
+              >
+            </div>
+
+            <label class="shortcut-label" for="shortcut-input">Current shortcut:</label>
+            <div class="shortcut-input-container">
+              <input id="shortcut-input" class="shortcut-input" type="text" placeholder=" " readonly />
+              <div class="shortcut-placeholder">Click here and press keys</div>
+            </div>
+
+            <div class="shortcut-info">Default: <span id="platform-default"></span></div>
+
+            <div class="shortcut-warning">
+              ⚠️ Warning: Some shortcuts may override browser functionality. For example, F12 opens developer tools, and
+              Cmd/Ctrl+Shift+C opens the element inspector.
+            </div>
+
+            <div class="shortcut-buttons">
+              <button id="save-shortcut" class="btn">Save Shortcut</button>
+              <button id="reset-shortcut" class="btn btn-secondary">Reset to Default</button>
+            </div>
           </div>
         </div>
 
