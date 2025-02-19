@@ -1,0 +1,1 @@
+# squiz-matrix-asset-id-copier
