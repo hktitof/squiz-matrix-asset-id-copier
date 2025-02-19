@@ -10,6 +10,31 @@ document.addEventListener("DOMContentLoaded", function () {
   const platformDefaultEl = document.getElementById("platform-default");
   const defaultShortcutEl = document.getElementById("default-shortcut");
 
+  // Function to check if domain is allowed
+  function isDomainAllowed(url) {
+    return new Promise(resolve => {
+      const origin = new URL(url).origin;
+      chrome.storage.local.get(["allowedDomains"], function (result) {
+        const allowedDomains = result.allowedDomains || [];
+        resolve(allowedDomains.includes(origin));
+      });
+    });
+  }
+
+  // Function to update UI based on permissions
+  function updateUIForPermissions(isAllowed) {
+    if (isAllowed) {
+      permissionRequiredEl.classList.add("hidden");
+      permissionsInfoEl.classList.add("hidden");
+      adminPageEl.classList.remove("hidden");
+      loadCurrentShortcut();
+    } else {
+      permissionRequiredEl.classList.remove("hidden");
+      permissionsInfoEl.classList.remove("hidden");
+      adminPageEl.classList.add("hidden");
+    }
+  }
+
   // Default shortcuts
   const MAC_DEFAULT = "Command+Shift+C";
   const WINDOWS_DEFAULT = "Ctrl+Shift+C";
@@ -176,8 +201,18 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
+  function isDomainAllowed(url) {
+    return new Promise(resolve => {
+      const origin = new URL(url).origin;
+      chrome.storage.local.get(["allowedDomains"], function (result) {
+        const allowedDomains = result.allowedDomains || [];
+        resolve(allowedDomains.includes(origin));
+      });
+    });
+  }
+
   // Check if the current tab is a Squiz Matrix admin page using the background script
-  chrome.runtime.sendMessage({ action: "checkIfAdmin" }, function (response) {
+  chrome.runtime.sendMessage({ action: "checkIfAdmin" }, async function (response) {
     loadingEl.classList.add("hidden");
 
     if (!response) {
@@ -190,7 +225,17 @@ document.addEventListener("DOMContentLoaded", function () {
     addDebugInfo("Is Admin Page: " + response.isAdmin);
 
     if (response.isAdmin) {
-      // It's a Squiz Matrix admin page - check if content script is running
+      // First check if domain is allowed
+      const isAllowed = await isDomainAllowed(response.url);
+
+      if (!isAllowed) {
+        // If domain isn't allowed, show permission required
+        permissionRequiredEl.classList.remove("hidden");
+        permissionsInfoEl.classList.remove("hidden");
+        return;
+      }
+
+      // If domain is allowed, check if content script is running
       chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         if (!tabs || !tabs[0]) {
           addDebugInfo("No active tab found");
@@ -204,6 +249,7 @@ document.addEventListener("DOMContentLoaded", function () {
           } else if (contentResponse && contentResponse.status === "active") {
             addDebugInfo("Content script is active");
             adminPageEl.classList.remove("hidden");
+            permissionsInfoEl.classList.add("hidden"); // Hide permissions info
             loadCurrentShortcut();
           } else {
             addDebugInfo("Unknown content script state");
@@ -236,25 +282,19 @@ document.addEventListener("DOMContentLoaded", function () {
       const origin = new URL(tabs[0].url).origin;
       addDebugInfo("Adding permission for: " + origin);
 
-      // Add this domain to our allowed list
       chrome.storage.local.get(["allowedDomains"], function (result) {
         const allowedDomains = result.allowedDomains || [];
         if (!allowedDomains.includes(origin)) {
           allowedDomains.push(origin);
           chrome.storage.local.set({ allowedDomains: allowedDomains }, function () {
             addDebugInfo("Domain added. Reloading...");
-            // Force injection of content script
             chrome.scripting
               .executeScript({
                 target: { tabId: tabs[0].id, allFrames: true },
                 files: ["content.js"],
               })
               .then(() => {
-                // Hide both the permission required and permissions info sections
-                permissionRequiredEl.classList.add("hidden");
-                permissionsInfoEl.classList.add("hidden");
-                adminPageEl.classList.remove("hidden");
-                loadCurrentShortcut();
+                updateUIForPermissions(true);
                 addDebugInfo("Script injected successfully");
               })
               .catch(err => {
@@ -271,11 +311,7 @@ document.addEventListener("DOMContentLoaded", function () {
               files: ["content.js"],
             })
             .then(() => {
-              // Hide both the permission required and permissions info sections
-              permissionRequiredEl.classList.add("hidden");
-              permissionsInfoEl.classList.add("hidden");
-              adminPageEl.classList.remove("hidden");
-              loadCurrentShortcut();
+              updateUIForPermissions(true);
               addDebugInfo("Script re-injected successfully");
             })
             .catch(err => {

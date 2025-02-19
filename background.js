@@ -43,6 +43,14 @@ chrome.runtime.onInstalled.addListener(() => {
   console.log("Squiz Matrix Asset ID Copier extension installed");
 });
 
+// Clean up all storage when extension is uninstalled
+chrome.runtime.onSuspend.addListener(() => {
+  // Clear all local storage
+  chrome.storage.local.clear(() => {
+    console.log("All extension storage data cleared");
+  });
+});
+
 // Listen for messages from popup.js
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "checkIfAdmin") {
