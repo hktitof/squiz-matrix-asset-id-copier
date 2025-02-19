@@ -20,6 +20,11 @@ function isSquizMatrixAdmin(url) {
 // Log URL information for debugging
 chrome.tabs.onActivated.addListener(function (activeInfo) {
   chrome.tabs.get(activeInfo.tabId, function (tab) {
+    // Add error check here
+    if (chrome.runtime.lastError) {
+      console.warn("Tab error:", chrome.runtime.lastError);
+      return;
+    }
     if (tab.url) {
       console.log("Tab URL: " + tab.url);
       console.log("Is Squiz Matrix admin: " + isSquizMatrixAdmin(tab.url));
