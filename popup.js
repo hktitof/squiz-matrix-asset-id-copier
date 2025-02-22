@@ -9,6 +9,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const resetShortcutBtn = document.getElementById("reset-shortcut");
   const platformDefaultEl = document.getElementById("platform-default");
   const defaultShortcutEl = document.getElementById("default-shortcut");
+  // get active-alert-green element
+  const activeAlertGreen = document.getElementById("active-alert-green");
 
   // Function to check if domain is allowed
   function isDomainAllowed(url) {
@@ -232,6 +234,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // If domain isn't allowed, show permission required
         permissionRequiredEl.classList.remove("hidden");
         permissionsInfoEl.classList.remove("hidden");
+
         return;
       }
 
@@ -250,6 +253,7 @@ document.addEventListener("DOMContentLoaded", function () {
             addDebugInfo("Content script is active");
             adminPageEl.classList.remove("hidden");
             permissionsInfoEl.classList.add("hidden"); // Hide permissions info
+            activeAlertGreen.classList.add("hidden"); // Hide active-alert-green when user is on admin page
             loadCurrentShortcut();
           } else {
             addDebugInfo("Unknown content script state");
@@ -260,6 +264,7 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
       // Not a Squiz Matrix admin page
       notAdminPageEl.classList.remove("hidden");
+      permissionsInfoEl.classList.add("hidden"); // Add this line
     }
   });
 
