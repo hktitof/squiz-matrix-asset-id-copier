@@ -10,6 +10,9 @@
   const DEFAULT_WINDOWS_SHORTCUT = "Ctrl+Shift+C";
   const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
 
+  // store notification preference
+  let showNotifications = true;
+
   // Load the saved shortcut
   chrome.storage.local.get(["keyboardShortcut"], function (result) {
     currentShortcut = result.keyboardShortcut || (isMac ? DEFAULT_MAC_SHORTCUT : DEFAULT_WINDOWS_SHORTCUT);
@@ -42,6 +45,8 @@
 
   // Function to show a temporary notification
   function showNotification(message, isError = false) {
+    // Skip notifications if disabled
+    if (!showNotifications) return;
     const notification = document.createElement("div");
     notification.textContent = message;
     notification.style.position = "fixed";
@@ -128,6 +133,12 @@
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === "ping") {
       sendResponse({ status: "active" });
+    }
+
+    // handle notification preference updates
+    if (message.action === "updateNotificationPreference" && message.showNotifications !== undefined) {
+      showNotifications = message.showNotifications;
+      console.log("Updated notification preference to: " + showNotifications);
     }
 
     // Handle shortcut update

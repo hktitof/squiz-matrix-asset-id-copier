@@ -17,6 +17,25 @@ function isSquizMatrixAdmin(url) {
   return false;
 }
 
+// Add an event listener for when the extension is installed
+chrome.runtime.onInstalled.addListener(() => {
+  // Get the current allowed domains and show notifications preferences from storage
+  chrome.storage.local.get(["allowedDomains", "showNotifications"], function (result) {
+    // If allowed domains are not set, set them to an empty array
+    if (!result.allowedDomains) {
+      chrome.storage.local.set({ allowedDomains: [] });
+    }
+
+    // Initialize notification preference if not set
+    if (result.showNotifications === undefined) {
+      chrome.storage.local.set({ showNotifications: true });
+    }
+  });
+
+  // Log that extension was installed
+  console.log("Squiz Matrix Asset ID Copier extension installed");
+});
+
 // Log URL information for debugging
 chrome.tabs.onActivated.addListener(function (activeInfo) {
   chrome.tabs.get(activeInfo.tabId, function (tab) {

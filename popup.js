@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const resetShortcutBtn = document.getElementById("reset-shortcut");
   const platformDefaultEl = document.getElementById("platform-default");
   const defaultShortcutEl = document.getElementById("default-shortcut");
+  const enableNotificationsCheckbox = document.getElementById("enable-notifications");
 
   // Function to check if domain is allowed
   function isDomainAllowed(url) {
@@ -210,6 +211,28 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     });
   }
+
+  // Load notification preference
+  chrome.storage.local.get(["showNotifications"], function (result) {
+    // Default to true if not set
+    const showNotifications = result.showNotifications !== false;
+    enableNotificationsCheckbox.checked = showNotifications;
+  });
+
+  // Save notification preference when changed
+  enableNotificationsCheckbox.addEventListener("change", function () {
+    chrome.storage.local.set({ showNotifications: enableNotificationsCheckbox.checked });
+
+    // Notify content script of the notification preference change
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      if (tabs[0] && tabs[0].id) {
+        chrome.tabs.sendMessage(tabs[0].id, {
+          action: "updateNotificationPreference",
+          showNotifications: enableNotificationsCheckbox.checked,
+        });
+      }
+    });
+  });
 
   // Check if the current tab is a Squiz Matrix admin page using the background script
   chrome.runtime.sendMessage({ action: "checkIfAdmin" }, async function (response) {
